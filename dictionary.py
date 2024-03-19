@@ -19,7 +19,7 @@ class CharDict:
             
     def process_word(self, word):
         for letter in word+'':
-            if letter == ' ':
+            if letter == ' ' or letter == ',' or letter == '.':
                 continue
             [count, next_chars]  = self.maps[letter]
             count += 1
