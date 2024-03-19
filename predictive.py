@@ -1,44 +1,21 @@
 import pygame
 import pickle
 from copy import deepcopy as copy
-from dictionary import get_dictionary, process_word
+from dictionary import *
 import sys
 
 # Initialize Pygame
 pygame.init()
-
 # Set up the display
 WIDTH, HEIGHT = 1500, 100
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Simple Text Editor")
-
-# Colors
+font = pygame.font.Font(None, 36)
 BLACK = (0, 0, 0)
 GREY = (127, 127, 127)
 WHITE = (255, 255, 255)
 
-# Vars
-font = pygame.font.Font(None, 36)
-
-def calculate_predictive_word(dict, word):
-    if word == '':
-        return (dict,'',False)
-    for letter in word[:-1]:
-        dict = dict.maps[letter][1]
-    return calculate_predictive_letter(dict, word[-1])
-
-def calculate_predictive_letter(dict, letter):
-    ptext = ''
-    if letter not in dict.maps:
-        return (dict,'',False)
-    iter_char = dict.maps[letter][1]
-    while iter_char and iter_char.maps:
-        next_letter = iter_char.next_favorite
-        if next_letter == '': break
-        ptext += next_letter
-        iter_char = iter_char.maps[next_letter][1]
-
-    return (dict.maps[letter][1],ptext,True)
+punctuations = get_punctuations()
 
 # Main loop
 def main():
@@ -74,7 +51,7 @@ def main():
                     predict_mode = False
                 else:
                     cont = True
-                    if event.unicode == ' ' or event.unicode == '.' or event.unicode == ',':
+                    if event.unicode in punctuations:
                         if predict_mode:
                             dictionary = process_word(dictionary, word.lower())
                         actual_char,ptext,word = (dictionary, '', '')
