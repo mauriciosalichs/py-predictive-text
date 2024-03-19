@@ -20,7 +20,9 @@ class CharDict:
                 self.next_favorite_count = self.maps[letter][0]
                 self.next_favorite = letter
             self = self.maps[letter][1]
-        self.maps[''] = [10, None]
+        self.next_favorite = ''
+        self.next_favorite_count = 20
+        self.maps[''] = [20, None]
         
     def process_word(self, word):
         for letter in word:
@@ -33,7 +35,6 @@ class CharDict:
                 self.next_favorite_count = count
             self.maps[letter][0] = count
             self = self.maps[letter][1]
-        print(self.char, self.maps)
         if '' not in self.maps:
             return
         [count, next_chars]  = self.maps['']

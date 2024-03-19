@@ -7,9 +7,9 @@ import sys
 # Initialize Pygame
 pygame.init()
 # Set up the display
-WIDTH, HEIGHT = 1500, 100
+WIDTH, HEIGHT = 1300, 700
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Simple Text Editor")
+pygame.display.set_caption("Editor by MS")
 font = pygame.font.Font(None, 36)
 BLACK = (0, 0, 0)
 GREY = (127, 127, 127)
@@ -19,7 +19,14 @@ punctuations = get_punctuations()
 
 # Main loop
 def main():
+    screen.fill(WHITE)
+    rendered_text = font.render("Cargando diccionario...", True, BLACK)
+    screen.blit(rendered_text, (10, 10))
+    pygame.display.flip()
+    screen.fill(BLACK)
+    
     text = ''
+    texts = []
     clock = pygame.time.Clock()
     dictionary = get_dictionary()
     predict_mode = True
@@ -36,7 +43,8 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    text += '\n'
+                    texts.append(text)
+                    text = ''
                 elif event.key == pygame.K_LSHIFT:
                     continue
                 elif event.key == pygame.K_TAB and predict_mode:
@@ -47,8 +55,12 @@ def main():
                 elif event.key == pygame.K_BACKSPACE:
                     #if text[-1].isalpha(): actual_char,ptext,_ = calculate_predictive_word(dictionary, word[:-1])
                     ptext = ''
-                    text = text[:-1]
                     predict_mode = False
+                    if text:
+                        text = text[:-1]
+                    elif texts:
+                        text = texts.pop()
+                        text = text[:-1]
                 else:
                     cont = True
                     if event.unicode in punctuations:
@@ -66,12 +78,23 @@ def main():
         screen.fill(BLACK)
 
         # Render the text
+        i = 0
+        for t in texts:
+            rendered_text = font.render(t, True, WHITE)
+            screen.blit(rendered_text, (10, i*30+10))
+            i += 1
         rendered_text = font.render(text, True, WHITE)
         rendered_ptext = font.render(ptext, True, GREY)
-        text_width, text_height = rendered_text.get_size()
+        text_width, _ = rendered_text.get_size()
+        pred_width, _ = rendered_ptext.get_size()
         
-        screen.blit(rendered_text, (10, 10))
-        screen.blit(rendered_ptext, (10+text_width, 10))
+        if text_width+pred_width >= WIDTH - 20: # Text too wide
+            last_word = text.split()[-1]  # Split the text into words
+            texts.append(text[:-len(last_word)])
+            text = last_word
+            continue
+        screen.blit(rendered_text, (10, i*30+10))
+        screen.blit(rendered_ptext, (10+text_width, i*30+10))
 
         # Update the display
         pygame.display.flip()
